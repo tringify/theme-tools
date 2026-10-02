@@ -1,12 +1,26 @@
 # Tringify theme tools
 
-Command-line tools for building Tringify storefront themes. Create a theme from the [starter theme](https://github.com/tringify/theme-starter), preview it locally with sample content, validate it, and package it for upload in the Tringify Developer Portal.
+The validator and preview renderer for Tringify storefront themes, and the original `tringify-theme` command-line tool.
+
+**To build themes, use the [Tringify CLI](https://github.com/tringify/cli).** Its `tringify theme` commands do everything described below, with the same rules and output, as a single binary with nothing else to install. It downloads the validator and preview renderer from this repository's releases on first use and verifies them against `SHA256SUMS`:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/tringify/cli/main/install.sh | sh
+tringify theme init my-theme
+cd my-theme
+tringify theme preview
+```
 
 New to Tringify themes? Follow [Build your first theme](https://dev-docs.tringify.com/themes/build-your-first-theme).
 
-## Install
+## What is in this repository
 
-Python 3.10 or newer is required.
+- **Releases** for macOS (Apple silicon and Intel), Linux (x86-64 and ARM64), and Windows (x86-64). Each archive contains two prebuilt binaries, `themecheck`, the theme validator, and `theme-preview-render`, the local preview renderer, along with the `tringify-theme` command. The Tringify CLI uses these releases.
+- **The `tringify-theme` command**, written in Python. It still works and is still published for people who already use it, but new features go into the Tringify CLI. Each `tringify-theme` command has a `tringify theme` equivalent, and both work on the same theme files.
+
+## Install `tringify-theme`
+
+This is only needed if you want the Python command rather than the Tringify CLI. Python 3.10 or newer is required.
 
 macOS and Linux:
 
@@ -26,9 +40,7 @@ This installs in `%LOCALAPPDATA%\Tringify\theme-tools` and adds that directory t
 
 To install manually, download the archive for your platform from [Releases](https://github.com/tringify/theme-tools/releases), check it against `SHA256SUMS`, unzip it, and run `tringify-theme` (or `tringify-theme.cmd` on Windows) from the extracted directory. On macOS, an archive downloaded with a browser may need `xattr -dr com.apple.quarantine tringify-theme-tools` before its binaries can run.
 
-Releases are available for macOS (Apple silicon and Intel), Linux (x86-64 and ARM64), and Windows (x86-64). Each archive contains the command-line source from this repository and two platform binaries: `themecheck`, the theme validator, and `theme-preview-render`, the local preview renderer.
-
-## Quick start
+## Quick start with `tringify-theme`
 
 ```sh
 git clone https://github.com/tringify/theme-starter
@@ -44,11 +56,13 @@ tringify-theme check
 tringify-theme package dist/my-theme.zip
 ```
 
+With the Tringify CLI, the same steps are `tringify theme init my-theme`, `tringify theme preview`, `tringify theme check` and `tringify theme package`.
+
 Upload the ZIP in the Developer Portal under **Themes**, install it on a development store, and test it with that store's products before publishing.
 
 ## Commands
 
-Every command prints a concise message and exits non-zero on failure. `ROOT` defaults to the current directory.
+These are the `tringify-theme` commands. Each is also available as `tringify theme <command>` in the Tringify CLI. Every command prints a concise message and exits non-zero on failure. `ROOT` defaults to the current directory.
 
 | Command | What it does |
 | --- | --- |
@@ -127,7 +141,7 @@ Prints the exact sample data the preview gives a page, validated against the con
 
 ## Binary locations
 
-The commands look for `themecheck` and `theme-preview-render` in this order: the `--checker` or `--renderer` option, the `TRINGIFY_THEME_CHECK` or `TRINGIFY_THEME_PREVIEW` environment variable, your `PATH`, then the directory containing `theme.py`.
+The commands look for `themecheck` and `theme-preview-render` in this order: the `--checker` or `--renderer` option, the `TRINGIFY_THEME_CHECK` or `TRINGIFY_THEME_PREVIEW` environment variable, your `PATH`, then the directory containing `theme.py`. The Tringify CLI uses the same order, and then its own downloaded copy.
 
 ## Theme source
 
@@ -138,6 +152,7 @@ Keep `src/.generated-sections.json` in version control. It records which section
 ## Documentation
 
 - [Build your first theme](https://dev-docs.tringify.com/themes/build-your-first-theme)
+- [Tringify CLI](https://github.com/tringify/cli)
 - [Theme development](https://dev-docs.tringify.com/themes/)
 - [Theme package structure](https://dev-docs.tringify.com/themes/theme-package-structure)
 - [Demo content](https://dev-docs.tringify.com/themes/demo-content)
