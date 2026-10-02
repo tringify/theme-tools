@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+dist/
+.DS_Store
+themecheck
+themecheck.exe
+theme-preview-render
+theme-preview-render.exe
