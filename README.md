@@ -112,7 +112,7 @@ To open the preview from another device on a trusted network, pass the computer'
 tringify-theme check [ROOT] [--mode sealed|development]
 ```
 
-Validates the compiled theme without rebuilding it. Errors name the affected file and the reason. Fix the source under `src/`, run `build`, then run `check` again. `--mode` defaults to `sealed`, which applies upload rules.
+Validates the compiled theme without rebuilding it. Errors name the affected file and the reason. Fix the source under `src/`, run `build`, then run `check` again. `--mode` defaults to `sealed`, which applies upload rules, including a non-empty template for every storefront page: the Gift Card page (`templates/gift_card.json`) too. `--mode development` leaves that out while you build one page at a time. What a theme builds for Gift Cards: [Gift Cards in your theme](https://dev-docs.tringify.com/themes/gift-cards).
 
 ### package
 
@@ -156,6 +156,7 @@ Keep `src/.generated-sections.json` in version control. It records which section
 - [Theme development](https://dev-docs.tringify.com/themes/)
 - [Theme package structure](https://dev-docs.tringify.com/themes/theme-package-structure)
 - [Demo content](https://dev-docs.tringify.com/themes/demo-content)
+- [Gift Cards in your theme](https://dev-docs.tringify.com/themes/gift-cards)
 - [Vascula template language](https://vascula.dev)
 
 ## Development
