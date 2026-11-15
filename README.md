@@ -1,8 +1,8 @@
 # Tringify theme tools
 
-The validator and preview renderer for Tringify storefront themes, and the original `tringify-theme` command-line tool.
+The theme validator and the preview renderer for Tringify storefront themes, published as releases for the [Tringify CLI](https://github.com/tringify/cli).
 
-**To build themes, use the [Tringify CLI](https://github.com/tringify/cli).** Its `tringify theme` commands do everything described below, with the same rules and output, as a single binary with nothing else to install. It downloads the validator and preview renderer from this repository's releases on first use and verifies them against `SHA256SUMS`:
+To build themes, install the CLI and use its `tringify theme` commands:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/tringify/cli/main/install.sh | sh
@@ -11,162 +11,17 @@ cd my-theme
 tringify theme preview
 ```
 
-New to Tringify themes? Follow [Build your first theme](https://dev-docs.tringify.com/themes/build-your-first-theme).
+The CLI downloads the newest release from this repository the first time you check, package or preview a theme, verifies it against `SHA256SUMS`, and looks for a newer release at most every 15 minutes. New to Tringify themes? Follow [Build your first theme](https://dev-docs.tringify.com/themes/build-your-first-theme).
 
-## What is in this repository
+## Releases
 
-- **Releases** for macOS (Apple silicon and Intel), Linux (x86-64 and ARM64), and Windows (x86-64). Each archive contains two prebuilt binaries, `themecheck`, the theme validator, and `theme-preview-render`, the local preview renderer, along with the `tringify-theme` command. The Tringify CLI uses these releases.
-- **The `tringify-theme` command**, written in Python. It still works and is still published for people who already use it, but new features go into the Tringify CLI. Each `tringify-theme` command has a `tringify theme` equivalent, and both work on the same theme files.
+Each release has one archive per platform: macOS (Apple silicon and Intel), Linux (x86-64 and ARM64) and Windows (x86-64, which also runs on Windows on Arm). An archive holds two programs:
 
-## Install `tringify-theme`
+- `themecheck`, the theme validator: the same rules a theme upload is checked with. `themecheck -json` gives the stable error `code` and structured `details` for scripts.
+- `theme-preview-render`, the preview renderer: it renders a theme with sample content the way a store renders it.
 
-This is only needed if you want the Python command rather than the Tringify CLI. Python 3.10 or newer is required.
-
-macOS and Linux:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/tringify/theme-tools/main/install.sh | sh
-```
-
-The script downloads the release for your platform, verifies its SHA-256 checksum, installs it in `~/.tringify/theme-tools`, and adds a `tringify-theme` command to `~/.local/bin`. Set `TRINGIFY_THEME_TOOLS_VERSION` to install a specific release tag.
-
-Windows (PowerShell):
-
-```powershell
-irm https://raw.githubusercontent.com/tringify/theme-tools/main/install.ps1 | iex
-```
-
-This installs in `%LOCALAPPDATA%\Tringify\theme-tools` and adds that directory to your user `PATH`.
-
-To install manually, download the archive for your platform from [Releases](https://github.com/tringify/theme-tools/releases), check it against `SHA256SUMS`, unzip it, and run `tringify-theme` (or `tringify-theme.cmd` on Windows) from the extracted directory. On macOS, an archive downloaded with a browser may need `xattr -dr com.apple.quarantine tringify-theme-tools` before its binaries can run.
-
-## Quick start with `tringify-theme`
-
-```sh
-git clone https://github.com/tringify/theme-starter
-tringify-theme init my-theme --from theme-starter --name "My Theme"
-cd my-theme
-tringify-theme preview
-```
-
-Open the printed URL, edit a section under `src/sections/`, and the preview rebuilds. When you are ready to upload:
-
-```sh
-tringify-theme check
-tringify-theme package dist/my-theme.zip
-```
-
-With the Tringify CLI, the same steps are `tringify theme init my-theme`, `tringify theme preview`, `tringify theme check` and `tringify theme package`.
-
-Upload the ZIP in the Developer Portal under **Themes**, install it on a development store, and test it with that store's products before publishing.
-
-## Commands
-
-These are the `tringify-theme` commands. Each is also available as `tringify theme <command>` in the Tringify CLI. Every command prints a concise message and exits non-zero on failure. `ROOT` defaults to the current directory.
-
-| Command | What it does |
-| --- | --- |
-| `init DESTINATION --from SOURCE --name NAME` | Creates a new theme from a local theme directory, such as the starter theme. |
-| `build [ROOT]` | Compiles `src/sections/<name>` into `sections/<name>.vasc` and updates the section index in `theme.json`. |
-| `preview [ROOT]` | Serves a live preview with sample content and rebuilds when source files change. |
-| `check [ROOT]` | Validates the compiled theme with the same rules used when a theme is uploaded. |
-| `package [ROOT] OUTPUT` | Builds, validates, and writes an upload-ready ZIP. |
-| `contract` | Prints the theme author contract as JSON. |
-| `context [ROOT] --page PAGE` | Prints the sample data a page receives in the preview. |
-
-### init
-
-```sh
-tringify-theme init DESTINATION --from SOURCE --name NAME
-```
-
-Copies a local theme into a new directory, sets its display name, builds the section sources, and validates the result. `DESTINATION` must not exist and must be outside the source theme. `NAME` must be 1–100 characters. The source is never modified, and nothing is created if validation fails.
-
-`init` works offline. It keeps `README.md`, `LICENSE`, and `NOTICE` files, and leaves out Git history, dependencies, environment files, and previous build archives. Symlinks, unsupported source files, more than 2,000 files, or more than 100 MiB of source are rejected.
-
-### build
-
-```sh
-tringify-theme build [ROOT]
-```
-
-Compiles each `src/sections/<name>/` directory into `sections/<name>.vasc` and updates the section entries in `theme.json`. It does not change surface permissions or templates; update those when you rename or remove a section.
-
-### preview
-
-```sh
-tringify-theme preview [ROOT] [--port 9292] [--preset NAME] [--host ADDRESS]
-```
-
-Starts a local preview at `127.0.0.1:9292`. Choose a page and switch between desktop and mobile widths. The preview rebuilds in a temporary copy when sections, templates, settings, translations, assets, or demo content change. A failed edit shows the error and keeps the last successful page. Use `--preset` to preview a style preset.
-
-The preview uses the theme's `demo/catalog.json`. Without a demo pack it supplies sample products, a cart, collections, categories, vendors, brands, an article, and an About page in English and USD.
-
-Forms, sign-in, cart changes, checkout, and network requests from theme scripts are disabled in the preview. Test those on a development store.
-
-To open the preview from another device on a trusted network, pass the computer's LAN address with `--host`. Stop the server with Ctrl+C.
-
-### check
-
-```sh
-tringify-theme check [ROOT] [--mode sealed|development]
-```
-
-Validates the compiled theme without rebuilding it. Errors name the affected file and the reason. Fix the source under `src/`, run `build`, then run `check` again. `--mode` defaults to `sealed`, which applies upload rules, including a non-empty template for every storefront page: the Gift Card page (`templates/gift_card.json`) too. `--mode development` leaves that out while you build one page at a time. What a theme builds for Gift Cards: [Gift Cards in your theme](https://dev-docs.tringify.com/themes/gift-cards).
-
-### package
-
-```sh
-tringify-theme package [ROOT] OUTPUT
-```
-
-Rebuilds the section sources in a temporary copy, validates the theme, and writes `OUTPUT` atomically. A failed validation never replaces an existing package. Outputs inside the theme must be under `dist/`. Packages are deterministic and leave out editable sources and repository files.
-
-### contract
-
-```sh
-tringify-theme contract
-```
-
-Prints the versioned author contract: every `ctx_needs` root and its fields, value types, editor setting and resource picker types, nesting limits, the demo schema version, and the hosted form actions a theme can use.
-
-### context
-
-```sh
-tringify-theme context . --page product --entity ceramic-mug
-tringify-theme context . --page collection --preset "Soft Neutral"
-```
-
-Prints the exact sample data the preview gives a page, validated against the contract. Pages include `home`, `product`, `collection`, `category`, `vendor`, `brand`, `blog`, and `page`. Omit `--entity` to use the first matching record in the demo pack.
-
-## Binary locations
-
-The commands look for `themecheck` and `theme-preview-render` in this order: the `--checker` or `--renderer` option, the `TRINGIFY_THEME_CHECK` or `TRINGIFY_THEME_PREVIEW` environment variable, your `PATH`, then the directory containing `theme.py`. The Tringify CLI uses the same order, and then its own downloaded copy.
-
-## Theme source
-
-Edit sections in `src/sections/<name>/` as `body.html`, `style.css`, and `schema.json`, with shared styles in `src/_shared.css`, or write `sections/*.vasc` files directly. A package is assembled from `assets`, `blocks`, `config`, `demo`, `locales`, `sections`, and `templates`, plus `theme.json` and `tokens.json`.
-
-Keep `src/.generated-sections.json` in version control. It records which section files the builder generated, so removing a source section also removes its output safely.
-
-## Documentation
-
-- [Build your first theme](https://dev-docs.tringify.com/themes/build-your-first-theme)
-- [Tringify CLI](https://github.com/tringify/cli)
-- [Theme development](https://dev-docs.tringify.com/themes/)
-- [Theme package structure](https://dev-docs.tringify.com/themes/theme-package-structure)
-- [Demo content](https://dev-docs.tringify.com/themes/demo-content)
-- [Gift Cards in your theme](https://dev-docs.tringify.com/themes/gift-cards)
-- [Vascula template language](https://vascula.dev)
-
-## Development
-
-Run the tests with:
-
-```sh
-python3 -m unittest discover -s tests
-```
+The CLI uses them for you. To use a release other than the newest, set `TRINGIFY_THEME_TOOLS_VERSION`; to use copies you already have, set `TRINGIFY_THEME_CHECK` and `TRINGIFY_THEME_PREVIEW`.
 
 ## License
 
-The source in this repository is available under the [MIT License](LICENSE).
+[MIT](LICENSE)
